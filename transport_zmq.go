@@ -32,13 +32,14 @@ func (s *zmqSocket) Close() error {
 
 func (s *zmqSocket) Request(req string) (string, error) {
 	var (
-		reply []string
-		err   error
+		signature = []byte{0xaa, 0xff}
+		reply     []string
+		err       error
 	)
 
 	// NOTE: for whatever reasons, we need to send an empty
 	// frame first.
-	if _, err = s.Socket.SendMessage("", req); err != nil {
+	if _, err = s.Socket.SendMessage(signature, req); err != nil {
 		return "", err
 	}
 
