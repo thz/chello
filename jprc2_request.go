@@ -78,6 +78,8 @@ func kvPairsToMap(pairs []string) map[string]interface{} {
 			// a json.Number
 			if _, err := strconv.ParseFloat(parts[1], 64); err == nil {
 				val = json.Number(parts[1])
+			} else {
+				val = parts[1]
 			}
 		}
 		m[key] = val
