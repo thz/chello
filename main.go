@@ -31,7 +31,8 @@ func main() {
 	flag.StringVar(&cli.id, "id", cli.id, "id to send with requests")
 	flag.StringVar(&cli.encoding, "enc", cli.encoding, "which encoding to use")
 	flag.StringVar(&cli.addr, "addr", cli.addr, "addr to use for transport")
-	flag.StringVar(&cli.transport, "transport", cli.transport, "which transport to use")
+	flag.StringVar(&cli.transport, "transport", cli.transport,
+		fmt.Sprintf("which transport to use (%s)", availableTransports()))
 	flag.BoolVar(&cli.indent, "indent", cli.indent, "indent jsonrpc answer")
 	flag.Parse()
 
