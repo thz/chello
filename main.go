@@ -21,6 +21,7 @@ func main() {
 		addr      string
 		encoding  string
 		indent    bool
+		echo      bool
 		transport string
 	}{
 		addr:      "tcp://127.0.0.1:26000",
@@ -34,6 +35,7 @@ func main() {
 	flag.StringVar(&cli.transport, "transport", cli.transport,
 		fmt.Sprintf("which transport to use (%s)", availableTransports()))
 	flag.BoolVar(&cli.indent, "indent", cli.indent, "indent jsonrpc answer")
+	flag.BoolVar(&cli.echo, "echo", cli.echo, "show what gets send (on stderr)")
 	flag.Parse()
 
 	var request = NewJSONRPCRequest(cli.id)
@@ -43,7 +45,9 @@ func main() {
 	}
 
 	payload, _ := request.toJSON()
-	fmt.Fprintln(os.Stderr, "sending:", payload)
+	if cli.echo {
+		fmt.Fprintln(os.Stderr, payload)
+	}
 
 	transport, err := NewTransport(cli.transport)
 	if err != nil {
