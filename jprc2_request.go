@@ -13,7 +13,7 @@ type jsonRPCRequest struct {
 	JsonRPC string      `json:"jsonrpc"`
 	Id      string      `json:"id"`
 	Method  string      `json:"method"`
-	Params  interface{} `json:"params",omitempty`
+	Params  interface{} `json:"params,omitempty"`
 }
 
 func NewJSONRPCRequest(id string) *jsonRPCRequest {
@@ -32,7 +32,6 @@ func (r *jsonRPCRequest) setMethodAndParams(args []string) error {
 		return fmt.Errorf("missing 'method' (first argument)")
 	case len(args) == 1:
 		r.Method = args[0]
-		r.Params = []string{}
 	case len(args) > 1:
 		r.Method = args[0]
 
