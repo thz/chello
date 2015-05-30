@@ -11,12 +11,12 @@ type helloTransport interface {
 	Request(req string) (reply string, err error)
 }
 
-type genTransport func() helloTransport
+type transGenerator func() (helloTransport, error)
 
-var transporter map[string]genTransport = make(map[string]genTransport)
+var transporter map[string]transGenerator = make(map[string]transGenerator)
 
-func registerTransport(id string, generator genTransport) {
-	transporter[id] = generator
+func registerTransport(id string, gen transGenerator) {
+	transporter[id] = gen
 }
 
 func availableTransports() string {
@@ -28,9 +28,8 @@ func availableTransports() string {
 }
 
 func NewTransport(id string) (helloTransport, error) {
-	var generator, ok = transporter[id]
-	if ok == true {
-		return generator(), nil
+	if generate, ok := transporter[id]; ok {
+		return generate()
 	}
 	return nil, fmt.Errorf("invalid transport %q", id)
 }

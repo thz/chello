@@ -1,25 +1,25 @@
 package main
 
 import (
-	"fmt"
-
 	zmq "github.com/pebbe/zmq2"
 )
+
+func init() {
+	registerTransport("zmq", func() (helloTransport, error) {
+		return NewZmqSocket()
+	})
+}
 
 type zmqSocket struct {
 	*zmq.Socket
 }
 
-func init() {
-	var generator = func() helloTransport {
-		var sock, err = zmq.NewSocket(zmq.DEALER)
-
-		if err != nil {
-			panic(fmt.Errorf("error: %v\n", err))
-		}
-		return &zmqSocket{Socket: sock}
+func NewZmqSocket() (*zmqSocket, error) {
+	var sock, err = zmq.NewSocket(zmq.REQ)
+	if err == nil {
+		return &zmqSocket{sock}, nil
 	}
-	registerTransport("zmq", generator)
+	return nil, err
 }
 
 func (s *zmqSocket) Connect(addr string) error {
@@ -32,25 +32,16 @@ func (s *zmqSocket) Close() error {
 
 func (s *zmqSocket) Request(req string) (string, error) {
 	var (
-		signature = []byte{0xaa, 0xff}
-		reply     []string
-		err       error
+		reply []string
+		err   error
 	)
 
-	// NOTE: for whatever reasons, we need to send an empty
-	// frame first.
-	if _, err = s.Socket.SendMessage(signature, req); err != nil {
+	if _, err = s.Socket.SendMessage(req); err != nil {
 		return "", err
 	}
-
 	if reply, err = s.Socket.RecvMessage(0); err != nil {
 		return "", err
 	}
 
-	// NOTE: we also get 2 frames, the first one is empty
-	if len(reply) != 2 {
-		return "", fmt.Errorf("expected 2 frames, got %d", len(reply))
-	}
-
-	return reply[1], nil
+	return reply[0], nil
 }
