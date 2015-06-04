@@ -1,39 +1,39 @@
 package main
 
 import (
-    "net/http"
-    "bytes"
-    "io"
-    "strings"
+	"bytes"
+	"io"
+	"net/http"
+	"strings"
 )
 
 func init() {
-    registerTransport("http", func() (helloTransport, error) {
-        return &Saver{}, nil
-    })
+	registerTransport("http", func() (helloTransport, error) {
+		return &httpClient{}, nil
+	})
 }
 
-type Saver struct {
-    addr string
+type httpClient struct {
+	addr string
 }
 
-func (s *Saver) Connect(addr string) error {
-    s.addr = addr
-    return nil
+func (c *httpClient) Connect(addr string) error {
+	c.addr = addr
+	return nil
 }
 
-func (s *Saver) Close() error {
-    return nil
+func (c *httpClient) Close() error {
+	return nil
 }
 
-func (s *Saver) Request(req string) (string, error) {
-    request := strings.NewReader(req)
-    reply := bytes.NewBuffer(nil)
-    resp, err := http.Post(s.addr, "application/json", request)
-    if err != nil {
-        return "", err
-    }
-    defer resp.Body.Close()
-    _, err = io.Copy(reply, resp.Body)
-    return reply.String(), err
+func (c *httpClient) Request(req string) (string, error) {
+	var request = strings.NewReader(req)
+	var resp, err = http.Post(c.addr, "application/json", request)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	var reply = bytes.NewBuffer(nil)
+	_, err = io.Copy(reply, resp.Body)
+	return reply.String(), err
 }
