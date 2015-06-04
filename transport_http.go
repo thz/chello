@@ -8,9 +8,11 @@ import (
 )
 
 func init() {
-	registerTransport("http", func() (helloTransport, error) {
+	var gen = func() (helloTransport, error) {
 		return &httpClient{}, nil
-	})
+	}
+	registerTransport("https", gen)
+	registerTransport("http", gen)
 }
 
 type httpClient struct {

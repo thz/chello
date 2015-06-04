@@ -1,13 +1,17 @@
 package main
 
 import (
+	"net/url"
+
 	zmq "github.com/pebbe/zmq2"
 )
 
 func init() {
-	registerTransport("zmq", func() (helloTransport, error) {
+	var gen = func() (helloTransport, error) {
 		return NewZmqSocket()
-	})
+	}
+	registerTransport("zmq+ipc", gen)
+	registerTransport("zmq+tcp", gen)
 }
 
 type zmqSocket struct {
@@ -23,7 +27,9 @@ func NewZmqSocket() (*zmqSocket, error) {
 }
 
 func (s *zmqSocket) Connect(addr string) error {
-	return s.Socket.Connect(addr)
+	var url, _ = url.Parse(addr)
+	url.Scheme = url.Scheme[4:] // "zmq+XYZ"
+	return s.Socket.Connect(url.String())
 }
 
 func (s *zmqSocket) Close() error {

@@ -17,23 +17,20 @@ import (
 
 func main() {
 	var cli = struct {
-		id        string
-		addr      string
-		encoding  string
-		indent    bool
-		echo      bool
-		transport string
+		id       string
+		addr     string
+		encoding string
+		indent   bool
+		echo     bool
 	}{
-		addr:      "tcp://127.0.0.1:26000",
-		encoding:  "jsonrpc2",
-		transport: "zmq",
+		addr:     "127.0.0.1:26000",
+		encoding: "jsonrpc2",
 	}
 
 	flag.StringVar(&cli.id, "id", cli.id, "id to send with requests")
 	flag.StringVar(&cli.encoding, "enc", cli.encoding, "which encoding to use")
-	flag.StringVar(&cli.addr, "addr", cli.addr, "addr to use for transport")
-	flag.StringVar(&cli.transport, "transport", cli.transport,
-		fmt.Sprintf("which transport to use (%s)", availableTransports()))
+	flag.StringVar(&cli.addr, "addr", defaultAddr(cli.addr),
+		fmt.Sprintf("addr to use for transport (%s)", availableTransports()))
 	flag.BoolVar(&cli.indent, "indent", cli.indent, "indent jsonrpc answer")
 	flag.BoolVar(&cli.echo, "echo", cli.echo, "show what gets send (on stderr)")
 	flag.Parse()
@@ -49,7 +46,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, payload)
 	}
 
-	transport, err := NewTransport(cli.transport)
+	transport, err := newTransport(cli.addr)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating transport: %v\n", err)
 		os.Exit(1)
