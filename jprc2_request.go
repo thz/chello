@@ -41,7 +41,7 @@ func (r *jsonRPCRequest) setMethodAndParams(args []string) error {
 			// or an 'object' in javascript terms
 			r.Params = kvPairsToMap(args[1:])
 
-		} else if len(args[1]) > 1 && args[1][0] == '{' {
+		} else if len(args[1]) > 1 && strings.TrimLeft(args[1], " \n\t")[0] == '{' {
 			var obj, err = stringToJSObject(args[1])
 			if err != nil {
 				return err
