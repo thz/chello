@@ -42,11 +42,11 @@ func (r *jsonRPCRequest) setMethodAndParams(args []string) error {
 			r.Params = kvPairsToMap(args[1:])
 
 		} else if len(args[1]) > 1 && strings.TrimLeft(args[1], " \n\t")[0] == '{' {
-			var obj, err = stringToJSObject(args[1])
-			if err != nil {
+			raw := json.RawMessage(args[1])
+			if ok, err := isValidJSON(args[1]); !ok {
 				return err
 			}
-			r.Params = obj
+			r.Params = &raw
 		} else {
 			r.Params = args[1:]
 		}
@@ -86,11 +86,10 @@ func kvPairsToMap(pairs []string) map[string]interface{} {
 	return m
 }
 
-func stringToJSObject(s string) (interface{}, error) {
+func isValidJSON(s string) (bool, error) {
+	// is it valid json? try to decode it
 	var obj interface{}
 	var decoder = json.NewDecoder(strings.NewReader(s))
-	if err := decoder.Decode(&obj); err != nil {
-		return nil, err
-	}
-	return obj, nil
+	err := decoder.Decode(&obj)
+	return err == nil, err
 }
