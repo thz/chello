@@ -1,5 +1,5 @@
 
-chello: deps
+chello:
 	env GOPATH=`pwd`:`pwd`/vendor go build -v
 	
 deps: 
